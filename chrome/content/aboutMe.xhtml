@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html [
+  <!ENTITY % htmlDTD PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+  %htmlDTD;
+  <!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd">
+  %brandDTD;
+  <!ENTITY % aboutHistoryDTD SYSTEM "chrome://aboutMe/locale/aboutMe.dtd">
+  %aboutHistoryDTD;
+]>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <xul:stringbundleset id="strbundles">
+    <xul:stringbundle id="strings" src="chrome://aboutMe/locale/aboutMe.properties"/>
+  </xul:stringbundleset>
+  
+  <head>
+    <title>&aboutMe.pagetitle;</title>
+    <link rel="stylesheet" href="chrome://global/skin/about.css" type="text/css"/>
+    <link rel="stylesheet" href="chrome://aboutMe/content/aboutMe.css" type="text/css"/>
+    <script type="application/javascript;version=1.7" src="chrome://aboutMe/content/library/jquery-1.3.2.min.js"></script>
+    <script type="application/javascript;version=1.7" src="chrome://aboutMe/content/library/date.format.js"></script>
+    <script type="application/javascript;version=1.7" src="chrome://aboutMe/content/library/jquery.sparkline.min.js"></script>
+    <script type="application/javascript;version=1.7" src="chrome://aboutMe/content/library/jquery.trendgraph.js"></script>
+    <script type="application/javascript;version=1.7" src="chrome://aboutMe/content/aboutMe.js"></script>    
+  </head>
+
+  <body>
+    <h1>&aboutMe.header;</h1>
+    
+    <h2>&aboutMe.activity-stats;</h2>
+    <div id="activity-contents">
+      <h3>&aboutMe.most-visited;</h3>
+      <table id="most-visited"/>
+      
+      <h3>&aboutMe.hourly-activity;</h3>
+      <table id="hourly-activity"/>
+    </div>
+    
+    <h2>&aboutMe.download-stats;</h2>
+    <div id="downloads-contents">
+      <div id="downloads-stats" />
+      
+      <h3>&aboutMe.download-media-types;</h3>
+      <table id="downloads-pie" />
+      
+      <h3>&aboutMe.daily-downloads;</h3>
+      <table id="daily-downloads"/>
+    </div>
+  </body>
+</html>

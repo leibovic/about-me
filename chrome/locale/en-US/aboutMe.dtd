@@ -1,0 +1,16 @@
+<!ENTITY aboutMe.pagetitle "about:me">
+<!ENTITY aboutMe.header "about:me">
+<!ENTITY aboutMe.activity-stats "Activity Stats">
+<!ENTITY aboutMe.most-visited "Most Visited Sites">
+<!ENTITY aboutMe.hourly-activity "Hourly Browsing Activity">
+<!ENTITY aboutMe.download-media-types "Download Media Types">
+<!ENTITY aboutMe.download-stats "Downloads Stats">
+<!ENTITY aboutMe.daily-downloads "Daily Downloads Trends">
+<!ENTITY week.short-sunday "sun">
+<!ENTITY week.short-monday "mon">
+<!ENTITY week.short-tuesday "tue">
+<!ENTITY week.short-wednesday "wed">
+<!ENTITY week.short-thursday "thu">
+<!ENTITY week.short-friday "fri">
+<!ENTITY week.short-saturday "sat">
+

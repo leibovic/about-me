@@ -1,0 +1,61 @@
+/* --- jquery.bargraph.js --- */
+table.top-trends-chart span { color:#B10000; }
+table.top-trends-chart td { padding-bottom: 5px; vertical-align: center; }
+table.top-trends-chart td.label { text-align:right; vertical-align:top;}
+table.top-trends-chart td.data div.num { position:relative; float:right; top:-15px; color:#B10000; height:0; }
+table.top-trends-chart td.data div.bar { background:#B10000; height:15px; cursor:pointer;}
+table.top-trends-chart td.data div.bar:hover,
+table.top-trends-chart tr.expanded td.data div.bar { background:orange; }
+table.top-trends-chart tr.expanded td.data div.num { color:orange; }
+table.top-trends-chart td.data div.details { padding-top:5px; }
+
+table.bar-graph td { vertical-align:bottom; text-align:center; padding:0 2px; }
+table.bar-graph td a { color:#B10000; cursor:pointer; }
+table.bar-graph td div.bar { background:#B10000; width:15px; margin-left:auto; margin-right:auto; margin-top:5px; cursor:pointer;}
+table.bar-graph td[type='1'] a { color:#03198D; }  
+table.bar-graph td[type='1'] div.bar { background-color:#03198D; }
+table.bar-graph td.hover a { color:orange; }
+table.bar-graph td.hover div.bar { background:orange; }  
+table.bar-graph td.selected a { color:orange; text-decoration:none; }
+table.bar-graph td.selected div.bar { background:orange; }
+table.bar-graph tr.amPm td { font-weight:bold; }
+table.bar-graph tr.details td { text-align:left; padding-top:5px; }
+
+table.pie-chart td > div { padding-left:10px;}
+table.pie-chart td.legend { white-space:nowrap; }
+table.pie-chart td.legend div { cursor:pointer; padding-bottom:3px; }
+table.pie-chart td.legend div.selected { font-weight:bold; }
+
+/* --- about:me styles --- */
+
+body { max-width:70em; margin:3em auto;}
+h1 { border-bottom:1px solid threedlightshadow; margin:0 0 0.6em; }
+h3 { margin:5px 0; }
+h4 { font-weight:bold; margin: 0 0 5px 0; }
+ul, li { list-style: none;}
+a { color:#B10000; text-decoration:underline; }
+span.time { font-style:italic; }
+
+table#most-visited td.label img.favicon { margin-left:5px;}
+table#most-visited td.data div.details span { margin-left:5px; color:#000000; }
+table#most-visited td.data div.details img.favicon { margin-right:5px; } 
+
+table#hourly-activity { width:100%; }
+table#hourly-activity tr.details td img.favicon { margin-right:5px; }
+table#hourly-activity tr.details td span { margin-left:5px; }
+table#hourly-activity tr.details td div { padding-top:5px; }
+
+table#downloads-pie td.details div { padding-bottom:3px; }
+table#downloads-pie td.details img { margin-right:5px; } 
+table#downloads-pie td.details span { margin-left:5px; } 
+
+table#daily-downloads { width:100%; }
+table#daily-downloads td[type='0'] { text-align:right; padding-left:5px; margin-right:0; }
+table#daily-downloads td[type='0'] div.bar { margin-right:0; }
+table#daily-downloads td[type='1'] { text-align:left; padding-right:5px; margin-left:0; }
+table#daily-downloads td[type='1'] div.bar { margin-left:0; }
+table#daily-downloads tr.details td div { padding-top:5px; }
+table#daily-downloads tr.details img { margin-right:5px; }
+table#daily-downloads tr.details span { margin-left:5px;  }
+
+div#downloads-stats { font-size:1.2em; padding-bottom:5px; }
