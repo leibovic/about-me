@@ -18,12 +18,8 @@ AboutMe.prototype = {
     return Ci.nsIAboutModule.ALLOW_SCRIPT;
   },
 
-  classDescription: "About Me",
   classID: Components.ID("{5cc26918-9daa-4124-a742-29a1dba85fbd}"),
-  contractID: "@mozilla.org/network/protocol/about;1?what=me",
   QueryInterface: XPCOMUtils.generateQI([Ci.nsIAboutModule])
 }
 
-function NSGetModule(aCompMgr, aFileSpec) {
-  return XPCOMUtils.generateModule([AboutMe]);
-}
+var NSGetFactory = XPCOMUtils.generateNSGetFactory([AboutMe]);
