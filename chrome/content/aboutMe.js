@@ -117,7 +117,9 @@ var AboutMe = {
       handleRow: function fillMostVisitedSites_handleRow (aRow) {
         let rev_host = aRow.getResultByName("rev_host");
         let visits = aRow.getResultByName("visits");
-        
+        if (!rev_host || !visits)
+          return;
+
         let domain = me.prettyDomain(rev_host);
         let href = me.hrefDomain(rev_host);
         
@@ -146,7 +148,7 @@ var AboutMe = {
       handleRow: function renderTotalDetails_handleRow (aRow) {        
         let url = aRow.getResultByName("url");
         let title = aRow.getResultByName("title");
-        if (title == "")
+        if (!title)
           title = url;
         title = title.length > 60 ? title.substring(0, 60) + "..." : title;
 
