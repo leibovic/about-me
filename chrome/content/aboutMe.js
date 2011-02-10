@@ -91,7 +91,7 @@ var AboutMe = {
           let msg = $("<div>").addClass("no-content-message").
                     text(gStringBundle.getString("noHistoryMessage"));
           $("div#activity-contents").hide().after(msg);
-          $("#activity-start-container").hide();
+          $("#activity-start").hide();
         }
       }
     });
@@ -105,7 +105,7 @@ var AboutMe = {
           let msg = $("<div>").addClass("no-content-message").
                     text(gStringBundle.getString("noDownloadsMessage"));
           $("div#downloads-contents").hide().after(msg);  
-          $("#downloads-start-container").hide();
+          $("#downloads-start").hide();
         }
       }
     });
@@ -120,7 +120,8 @@ var AboutMe = {
               FROM moz_historyvisits",
       handleRow: function fillActivityStartDate_handleRow (aRow) {
         let time = aRow.getResultByName("time");
-        $("#activity-start").text(me.prettyTime(time));
+        let text = gStringBundle.getFormattedString("since", [me.prettyTime(time)]);
+        $("#activity-start").text(text);
       }
     });
   },
@@ -133,7 +134,8 @@ var AboutMe = {
               FROM moz_downloads",
       handleRow: function fillDonwloadsStartDate_handleRow (aRow) {
         let time = aRow.getResultByName("time");
-        $("#downloads-start").text(me.prettyTime(time));
+        let text = gStringBundle.getFormattedString("since", [me.prettyTime(time)]);
+        $("#downloads-start").text(text);
       }
     });
   },

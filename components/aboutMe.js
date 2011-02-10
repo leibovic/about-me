@@ -18,8 +18,17 @@ AboutMe.prototype = {
     return Ci.nsIAboutModule.ALLOW_SCRIPT;
   },
 
+  classDescription: "About Me",
   classID: Components.ID("{5cc26918-9daa-4124-a742-29a1dba85fbd}"),
+  contractID: "@mozilla.org/network/protocol/about;1?what=me",
   QueryInterface: XPCOMUtils.generateQI([Ci.nsIAboutModule])
 }
 
-var NSGetFactory = XPCOMUtils.generateNSGetFactory([AboutMe]);
+/**
+* XPCOMUtils.generateNSGetFactory was introduced in Mozilla 2 (Firefox 4).
+* XPCOMUtils.generateNSGetModule is for Mozilla 1.9.2 (Firefox 3.6).
+*/
+if (XPCOMUtils.generateNSGetFactory)
+    var NSGetFactory = XPCOMUtils.generateNSGetFactory([AboutMe]);
+else
+    var NSGetModule = XPCOMUtils.generateNSGetModule([AboutMe]);
