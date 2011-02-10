@@ -1,6 +1,7 @@
 <!ENTITY aboutMe.pagetitle "about:me">
 <!ENTITY aboutMe.header "about:me">
 <!ENTITY aboutMe.activity-stats "Activity Stats">
+<!ENTITY aboutMe.since "Since">
 <!ENTITY aboutMe.most-visited "Most Visited Sites">
 <!ENTITY aboutMe.hourly-activity "Hourly Browsing Activity">
 <!ENTITY aboutMe.download-media-types "Download Media Types">

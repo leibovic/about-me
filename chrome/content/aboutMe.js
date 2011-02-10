@@ -69,6 +69,9 @@ var AboutMe = {
   init: function AM_init () {
     this.checkUserData();
 
+    this.fillActivityStartDate();
+    this.fillDownloadsStartDate();
+
     this.fillMostVisitedSites();
     this.fillHourlyActivity();
 
@@ -88,6 +91,7 @@ var AboutMe = {
           let msg = $("<div>").addClass("no-content-message").
                     text(gStringBundle.getString("noHistoryMessage"));
           $("div#activity-contents").hide().after(msg);
+          $("#activity-start-container").hide();
         }
       }
     });
@@ -101,7 +105,35 @@ var AboutMe = {
           let msg = $("<div>").addClass("no-content-message").
                     text(gStringBundle.getString("noDownloadsMessage"));
           $("div#downloads-contents").hide().after(msg);  
+          $("#downloads-start-container").hide();
         }
+      }
+    });
+  },
+
+  // start dates --------------------------------------------------------------
+
+  fillActivityStartDate: function AM_fillActivityStartDate () {
+    let me = this;
+    me.processQuery({
+      query: "SELECT strftime('%s', MIN(visit_date)/1000000, 'unixepoch', 'localtime') as time  \
+              FROM moz_historyvisits",
+      handleRow: function fillActivityStartDate_handleRow (aRow) {
+        let time = aRow.getResultByName("time");
+        $("#activity-start").text(me.prettyTime(time));
+      }
+    });
+  },
+
+  fillDownloadsStartDate: function AM_fillDownloadsStartDate () {
+    let me = this;
+    me.processQuery({
+      db: downloadsDB,
+      query: "SELECT strftime('%s', MIN(startTime)/1000000, 'unixepoch', 'localtime') as time  \
+              FROM moz_downloads",
+      handleRow: function fillDonwloadsStartDate_handleRow (aRow) {
+        let time = aRow.getResultByName("time");
+        $("#downloads-start").text(me.prettyTime(time));
       }
     });
   },

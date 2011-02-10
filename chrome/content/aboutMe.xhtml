@@ -17,9 +17,10 @@
   
   <head>
     <title>&aboutMe.pagetitle;</title>
+    <link rel="icon" type="image/png" href="chrome://global/skin/icons/information-16.png"/>
     <link rel="stylesheet" href="chrome://global/skin/about.css" type="text/css"/>
     <link rel="stylesheet" href="chrome://aboutMe/content/aboutMe.css" type="text/css"/>
-    <script type="application/javascript;version=1.7" src="chrome://aboutMe/content/library/jquery-1.3.2.min.js"></script>
+    <script type="application/javascript;version=1.7" src="chrome://aboutMe/content/library/jquery-1.5.min.js"></script>
     <script type="application/javascript;version=1.7" src="chrome://aboutMe/content/library/date.format.js"></script>
     <script type="application/javascript;version=1.7" src="chrome://aboutMe/content/library/jquery.sparkline.min.js"></script>
     <script type="application/javascript;version=1.7" src="chrome://aboutMe/content/library/jquery.trendgraph.js"></script>
@@ -29,7 +30,7 @@
   <body>
     <h1>&aboutMe.header;</h1>
     
-    <h2>&aboutMe.activity-stats;</h2>
+    <h2>&aboutMe.activity-stats; <span id="activity-start-container">(&aboutMe.since; <span id="activity-start"/>)</span></h2>
     <div id="activity-contents">
       <h3>&aboutMe.most-visited;</h3>
       <table id="most-visited"/>
@@ -38,7 +39,7 @@
       <table id="hourly-activity"/>
     </div>
     
-    <h2>&aboutMe.download-stats;</h2>
+    <h2>&aboutMe.download-stats; <span id="downloads-start-container">(&aboutMe.since; <span id="downloads-start"/>)</span></h2>
     <div id="downloads-contents">
       <div id="downloads-stats" />
       

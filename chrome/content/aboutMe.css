@@ -1,6 +1,6 @@
 /* --- jquery.bargraph.js --- */
 table.top-trends-chart span { color:#B10000; }
-table.top-trends-chart td { padding-bottom: 5px; vertical-align: center; }
+table.top-trends-chart td { padding-bottom: 5px; vertical-align: middle; }
 table.top-trends-chart td.label { text-align:right; vertical-align:top;}
 table.top-trends-chart td.data div.num { position:relative; float:right; top:-15px; color:#B10000; height:0; }
 table.top-trends-chart td.data div.bar { background:#B10000; height:15px; cursor:pointer;}
