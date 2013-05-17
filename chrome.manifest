@@ -1,6 +1,7 @@
-content aboutMe chrome/content/
-locale aboutMe en-US chrome/locale/en-US/
+content     aboutMe                                       chrome/content/
+skin        aboutMe classic/1.0                           chrome/skin/
+locale      aboutMe en-US                                 chrome/locale/en-US/
 
 # The {classID} here must match the classID in mycomponent.js
-component {5cc26918-9daa-4124-a742-29a1dba85fbd} components/aboutMe.js
-contract @mozilla.org/network/protocol/about;1?what=me {5cc26918-9daa-4124-a742-29a1dba85fbd}
+#component {5cc26918-9daa-4124-a742-29a1dba85fbd} components/aboutMe.js
+#contract @mozilla.org/network/protocol/about;1?what=me {5cc26918-9daa-4124-a742-29a1dba85fbd}
