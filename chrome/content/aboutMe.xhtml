@@ -14,7 +14,7 @@
   <xul:stringbundleset id="strbundles">
     <xul:stringbundle id="strings" src="chrome://aboutMe/locale/aboutMe.properties"/>
   </xul:stringbundleset>
-  
+
   <head>
     <title>&aboutMe.pagetitle;</title>
     <link rel="icon" type="image/png" href="chrome://global/skin/icons/information-16.png"/>
@@ -24,28 +24,28 @@
     <script type="application/javascript;version=1.7" src="chrome://aboutMe/content/library/date.format.js"></script>
     <script type="application/javascript;version=1.7" src="chrome://aboutMe/content/library/jquery.sparkline.min.js"></script>
     <script type="application/javascript;version=1.7" src="chrome://aboutMe/content/library/jquery.trendgraph.js"></script>
-    <script type="application/javascript;version=1.7" src="chrome://aboutMe/content/aboutMe.js"></script>    
+    <script type="application/javascript;version=1.7" src="chrome://aboutMe/content/aboutMe.js"></script>
   </head>
 
   <body>
     <h1>&aboutMe.header;</h1>
-    
+
     <h2>&aboutMe.activity-stats; <span id="activity-start"/></h2>
     <div id="activity-contents">
       <h3>&aboutMe.most-visited;</h3>
       <table id="most-visited"/>
-      
+
       <h3>&aboutMe.hourly-activity;</h3>
       <table id="hourly-activity"/>
     </div>
-    
+
     <h2>&aboutMe.download-stats; <span id="downloads-start"/></h2>
     <div id="downloads-contents">
       <div id="downloads-stats" />
-      
+
       <h3>&aboutMe.download-media-types;</h3>
       <table id="downloads-pie" />
-      
+
       <h3>&aboutMe.daily-downloads;</h3>
       <table id="daily-downloads"/>
     </div>

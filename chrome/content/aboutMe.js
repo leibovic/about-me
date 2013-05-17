@@ -13,7 +13,7 @@
  *
  * The Original Code is about:me page code.
  *
- * The Initial Developer of the Original Code is 
+ * The Initial Developer of the Original Code is
  * Mozilla Corporation.
  * Portions created by the Initial Developer are Copyright (C) 2009
  * the Initial Developer. All Rights Reserved.
@@ -104,7 +104,7 @@ var AboutMe = {
         if (count == 0) {
           let msg = $("<div>").addClass("no-content-message").
                     text(gStringBundle.getString("noDownloadsMessage"));
-          $("div#downloads-contents").hide().after(msg);  
+          $("div#downloads-contents").hide().after(msg);
           $("#downloads-start").hide();
         }
       }
@@ -156,12 +156,12 @@ var AboutMe = {
 
         let domain = me.prettyDomain(rev_host);
         let href = me.hrefDomain(rev_host);
-        
+
         let favicon = fs.getFaviconImageForPage(ios.newURI(href, null, null)).spec;
         let label = $("<div>").append($("<a>").text(domain).attr("href", href)).
                     append($("<img>").attr("src", favicon).addClass("favicon").
                                       height(16).width(16));
-        
+
         $("table#most-visited").topTrendsChart({
           value: visits,
           label: label,
@@ -171,7 +171,7 @@ var AboutMe = {
       }
     });
   },
-  
+
   renderTotalDetails: function AM_renderTotalDetails (row) {
     let me = AboutMe;
     me.processQuery({
@@ -179,7 +179,7 @@ var AboutMe = {
               FROM moz_places WHERE rev_host = :rh \
               ORDER BY visit_count DESC LIMIT 5",
       params: { rh: row.data("data") },
-      handleRow: function renderTotalDetails_handleRow (aRow) {        
+      handleRow: function renderTotalDetails_handleRow (aRow) {
         let url = aRow.getResultByName("url");
         let title = aRow.getResultByName("title");
         if (!title)
@@ -208,7 +208,7 @@ var AboutMe = {
     let me = this;
     $("table#hourly-activity").barGraph({ type: "hourly" });
 
-    me.processQuery({ 
+    me.processQuery({
       query: "SELECT COUNT(*) as num_visits, \
               strftime('%H', visit_date/1000/1000, 'unixepoch', 'localtime') as hour \
               FROM moz_historyvisits v LEFT JOIN moz_places h ON v.place_id = h.id \
@@ -226,7 +226,7 @@ var AboutMe = {
 
   renderHourlyDetails: function AM_renderHourlyDetails (detailsRow) {
     let me = AboutMe;
-    let index = detailsRow.attr("index"); 
+    let index = detailsRow.attr("index");
     me.processQuery({
       query: "SELECT h.rev_host as rev_host, COUNT(v.id) as num_visits, \
               strftime('%H', v.visit_date/1000/1000, 'unixepoch', 'localtime') as hour \
@@ -241,7 +241,7 @@ var AboutMe = {
         let domain = me.prettyDomain(rev_host);
 
         let favicon = fs.getFaviconImageForPage(ios.newURI(href, null, null)).spec;
-        
+
         let hour_visits = aRow.getResultByName("num_visits");
         let visitForm = gStringBundle.getString("hourlyVisitCount");
         let visitText = PluralForm.get(hour_visits, visitForm)
@@ -252,7 +252,7 @@ var AboutMe = {
                                  append($("<a>").text(domain).
                                                  attr("href", href)).
                                  append($("<span>").text(visitText));
-                               
+
         if ($("td", detailsRow).length > 0)
           $("td", detailsRow).append(content);
         else
@@ -266,7 +266,7 @@ var AboutMe = {
   fillDailyDownloads: function AM_fillDailyDownloads () {
     let me = this;
     $("table#daily-downloads").barGraph({ type: "daily", barCount: 2 });
-    
+
     me.processQuery({
       db: downloadsDB,
       query: "SELECT COUNT(*) as number, \
@@ -274,7 +274,7 @@ var AboutMe = {
               strftime('%w', endTime/1000000, 'unixepoch', 'localtime') as day \
               FROM moz_downloads GROUP BY day ORDER BY day ASC",
       handleRow: function fillDownloads_handleRow (aRow) {
-        let day = aRow.getResultByName("day");      
+        let day = aRow.getResultByName("day");
 
         let items = aRow.getResultByName("number");
         let itemForm = gStringBundle.getString("itemCount");
@@ -286,7 +286,7 @@ var AboutMe = {
           renderDetails: me.renderDownloadsDetails,
           type: 0
         });
-        
+
         let size = aRow.getResultByName("size");
         let sizeForm = gStringBundle.getString("mbCount");
         let sizeText = PluralForm.get(size, sizeForm).replace("#1", size);
@@ -316,7 +316,7 @@ var AboutMe = {
               FROM moz_downloads WHERE day = :day GROUP BY date \
               ORDER BY endTime DESC",
       params: { day: index },
-      handleRow: function fillDownloadsDetailsStats_handleRow (aRow) {        
+      handleRow: function fillDownloadsDetailsStats_handleRow (aRow) {
         let day = aRow.getResultByName("day");
         let mb = aRow.getResultByName("mb");
         let number = aRow.getResultByName("number");
@@ -328,7 +328,7 @@ var AboutMe = {
                                 (me.dDAvg[day][0][1]++)*100)/100;
           me.dDAvg[day][1][0] = Math.round((me.dDAvg[day][1][0] + mb) /
                                 (me.dDAvg[day][1][1]++)*100)/100;
-        } else 
+        } else
           me.dDAvg[day] = [[number, 1], [mb, 1]];
 
         // update stats span or create a new one if it doesn't exist
@@ -338,11 +338,11 @@ var AboutMe = {
         let sizeForm = gStringBundle.getString("averageDownloadSize");
         let sizeText = PluralForm.get(me.dDAvg[day][1][0], sizeForm)
                                  .replace("#1", me.dDAvg[day][1][0]);
-        
+
         // todo: make sure this is inserted before other details
-        if ($("td", detailsRow).length == 0) 
+        if ($("td", detailsRow).length == 0)
           detailsRow.append($("<td>").attr("colspan", 0));
-          
+
         if ($("div.stats", detailsRow).length > 0)
           $("td div.stats", detailsRow).html(numText + "<br/>" + sizeText);
         else
@@ -360,8 +360,8 @@ var AboutMe = {
               FROM moz_downloads WHERE day = :day ORDER BY maxBytes DESC LIMIT 5",
       params: { day: index },
       handleRow: function fillDownloadsDetailsList_handleRow (aRow) {
-        let img = $("<img>").attr("src", "moz-icon://" + 
-                                         aRow.getResultByName("target") + 
+        let img = $("<img>").attr("src", "moz-icon://" +
+                                         aRow.getResultByName("target") +
                                          "?size=16");
         let name = $("<a>").text(aRow.getResultByName("name")).
                             attr("href", aRow.getResultByName("source"));
@@ -372,13 +372,13 @@ var AboutMe = {
                                               replace("#1", size) + ")");
         let timeText = $("<span>").addClass("time").
                                    text(me.prettyTime(aRow.getResultByName("time")));
-        
+
         let content = $("<div>").append(img).append(name).
                                  append(sizeText).append(timeText);
-        
+
         if ($("td", detailsRow).length == 0)
           detailsRow.append($("<td>").attr("colspan", 0));
-        
+
         // todo: make sure this is inserted after stats
         $("td", detailsRow).append(content);
       }
@@ -387,7 +387,7 @@ var AboutMe = {
 
 
   // downloads stats ----------------------------------------------------------
-  
+
   fillDownloadsStats: function AM_fillDownloadsStats () {
     let me = this;
     me.processQuery({
@@ -418,17 +418,17 @@ var AboutMe = {
       handleRow: function fillDownloadsPieChart_handleRow (aRow) {
         let mimeType = aRow.getResultByName("mimeType");
 
-        let label = ms.getFromTypeAndExtension(mimeType, null).description || 
+        let label = ms.getFromTypeAndExtension(mimeType, null).description ||
                     mimeType;
         if (label.length > 30)
           label = label.substr(0, 30) + "...";
-          
-        if (mimeType == "application/octet-stream" || mimeType == "" || 
+
+        if (mimeType == "application/octet-stream" || mimeType == "" ||
             $("table#downloads-pie").data("colorCounter") > 5) {
           mimeType = "other";
           label = gStringBundle.getString("otherTypes");
         }
-        
+
         $("table#downloads-pie").pieChart({
           key: mimeType,
           value: aRow.getResultByName("count"),
@@ -444,20 +444,20 @@ var AboutMe = {
     let key = detailsDiv.attr("key");
     let container = detailsDiv.parents("tr");
     let item = $("td.legend div[key='" + key + "']", container);
-    
+
     let handleRow = function renderPieChartDetails_handleRow (aRow) {
-      let img = $("<img>").attr("src", "moz-icon://" + 
-                                       aRow.getResultByName("target") + 
+      let img = $("<img>").attr("src", "moz-icon://" +
+                                       aRow.getResultByName("target") +
                                        "?size=16");
       let name = $("<a>").text(aRow.getResultByName("name")).
-                          attr("href", aRow.getResultByName("source"));        
+                          attr("href", aRow.getResultByName("source"));
       let time = $("<span>").addClass("time").
                              text(me.prettyTime(aRow.getResultByName("time")));
       let content = $("<div>").append(img).append(name).append(time)
-      
+
       detailsDiv.attr("key", key).append(content);
     }
-    
+
     if (key == "other") {
       let whereClauses = [];
       $("td.legend div", container).each(function () {
@@ -472,7 +472,7 @@ var AboutMe = {
                 ORDER BY endTime DESC LIMIT 5",
         handleRow: handleRow
       });
-    } else {    
+    } else {
       me.processQuery({
         db: downloadsDB,
         query: "SELECT name, source, target, mimeType, \
@@ -519,7 +519,7 @@ var AboutMe = {
       handleResult: function(aResultSet) {
         if (aItem.handleRow) {
           for (let row = aResultSet.getNextRow();
-               row; 
+               row;
                row = aResultSet.getNextRow()) {
             aItem.handleRow(row);
           }
@@ -542,6 +542,6 @@ String.prototype.reverse = function () {
   return this.split("").reverse().join("");
 }
 
-$(document).ready(function(){
+jQuery(document).ready(function(){
   AboutMe.init();
 });
