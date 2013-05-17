@@ -1,3 +1,12 @@
+/**
+ *
+ * This code was inspired by
+ * https://github.com/Mardak/restartless/blob/examples/registerService/bootstrap.js
+ *
+ * All credits to Edward Lee
+ *
+ */
+
 "use strict";
 
 const {interfaces: Ci, manager: Cm, results: Cr, utils: Cu} = Components;
@@ -23,7 +32,8 @@ let aboutMeFactory =
 };
 
 // about:me
-let aboutMe = {
+let aboutMe =
+{
   QueryInterface: XPCOMUtils.generateQI([Ci.nsIAboutModule]),
 
   getURIFlags: function(aURI)
