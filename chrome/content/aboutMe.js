@@ -39,15 +39,12 @@ let Cc = Components.classes;
 let Ci = Components.interfaces;
 let Cu = Components.utils;
 
-const Cc = Components.classes;
-const Ci = Components.interfaces;
-const Cu = Components.utils;
+Cu.import("resource://gre/modules/PluralForm.jsm");
 
 var hs = Cc["@mozilla.org/browser/nav-history-service;1"].
          getService(Ci.nsINavHistoryService);
 var ios = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-var fs = Cc["@mozilla.org/browser/favicon-service;1"].
-        getService(Ci.nsIFaviconService);
+
 var ms = Cc["@mozilla.org/mime;1"].getService(Ci.nsIMIMEService);
 
 var placesDB = hs.QueryInterface(Ci.nsPIPlacesDatabase).DBConnection;
@@ -147,10 +144,13 @@ var AboutMe = {
   fillMostVisitedSites: function AM_fillMostVisitedSites () {
     let me = this;
     me.processQuery({
-      query: "SELECT rev_host as rev_host, SUM(visit_count) as visits \
-              FROM moz_places GROUP BY rev_host \
+      query: "SELECT moz_favicons.url as favicon_url, rev_host as rev_host, SUM(visit_count) as visits \
+              FROM moz_places \
+              INNER JOIN moz_favicons ON moz_places.favicon_id = moz_favicons.id \
+              GROUP BY rev_host \
               ORDER BY SUM(visit_count) DESC LIMIT 10",
       handleRow: function fillMostVisitedSites_handleRow (aRow) {
+        let favicon = aRow.getResultByName("favicon_url");
         let rev_host = aRow.getResultByName("rev_host");
         let visits = aRow.getResultByName("visits");
         if (!rev_host || !visits)
@@ -159,8 +159,8 @@ var AboutMe = {
         let domain = me.prettyDomain(rev_host);
         let href = me.hrefDomain(rev_host);
 
-        let favicon = fs.getFaviconImageForPage(ios.newURI(href, null, null)).spec;
-        let label = $("<div>").append($("<a>").text(domain).attr("href", href)).
+        let label = $("<div>").
+                    append($("<a>").text(domain).attr("href", href)).
                     append($("<img>").attr("src", favicon).addClass("favicon").
                                       height(16).width(16));
 
@@ -177,23 +177,26 @@ var AboutMe = {
   renderTotalDetails: function AM_renderTotalDetails (row) {
     let me = AboutMe;
     me.processQuery({
-      query: "SELECT url, title, visit_count \
-              FROM moz_places WHERE rev_host = :rh \
-              ORDER BY visit_count DESC LIMIT 5",
+      query: "SELECT moz_favicons.url AS favicon_url, moz_places.url, moz_places.title, moz_places.visit_count \
+              FROM moz_places \
+              INNER JOIN moz_favicons ON moz_places.favicon_id = moz_favicons.id \
+              WHERE moz_places.rev_host = :rh \
+              ORDER BY moz_places.visit_count DESC LIMIT 5",
       params: { rh: row.data("data") },
       handleRow: function renderTotalDetails_handleRow (aRow) {
         let url = aRow.getResultByName("url");
-        let title = aRow.getResultByName("title");
-        if (!title)
-          title = url;
-        title = title.length > 60 ? title.substring(0, 60) + "..." : title;
-
-        let favicon = fs.getFaviconImageForPage(ios.newURI(url, null, null)).spec;
-
         let visits = aRow.getResultByName("visit_count");
         let visitForm = gStringBundle.getString("totalVisitCount");
         let visitText = PluralForm.get(visits, visitForm)
                                   .replace("#1", visits);
+
+        let favicon = aRow.getResultByName("favicon_url");
+        let title = aRow.getResultByName("title");
+
+        if (!title)
+          title = url;
+
+        title = title.length > 60 ? title.substring(0, 60) + "..." : title;
 
         $("td.data", row).append($("<div>").addClass("details").
           append($("<img>").attr("src", favicon).addClass("favicon").
@@ -230,9 +233,11 @@ var AboutMe = {
     let me = AboutMe;
     let index = detailsRow.attr("index");
     me.processQuery({
-      query: "SELECT h.rev_host as rev_host, COUNT(v.id) as num_visits, \
+      query: "SELECT f.url as favicon_url, h.rev_host as rev_host, COUNT(v.id) as num_visits, \
               strftime('%H', v.visit_date/1000/1000, 'unixepoch', 'localtime') as hour \
-              FROM moz_historyvisits v LEFT JOIN moz_places h ON v.place_id = h.id \
+              FROM moz_historyvisits v \
+              LEFT JOIN moz_places h ON v.place_id = h.id \
+              LEFT JOIN moz_favicons f ON h.favicon_id = f.id \
               WHERE hour = :hour AND v.visit_type \
               NOT IN (0, 4) AND rev_host IS NOT NULL \
               GROUP BY rev_host ORDER BY num_visits DESC LIMIT 5",
@@ -241,13 +246,11 @@ var AboutMe = {
         let rev_host = aRow.getResultByName("rev_host");
         let href = me.hrefDomain(rev_host);
         let domain = me.prettyDomain(rev_host);
-
-        let favicon = fs.getFaviconImageForPage(ios.newURI(href, null, null)).spec;
-
         let hour_visits = aRow.getResultByName("num_visits");
         let visitForm = gStringBundle.getString("hourlyVisitCount");
         let visitText = PluralForm.get(hour_visits, visitForm)
                                   .replace("#1", hour_visits);
+        let favicon = aRow.getResultByName("favicon_url");
 
         let content = $("<div>").append($("<img>").attr("src", favicon).
                                                    addClass("favicon")).
