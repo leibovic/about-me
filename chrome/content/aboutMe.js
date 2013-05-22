@@ -35,7 +35,9 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-Components.utils.import("resource://gre/modules/PluralForm.jsm");
+let Cc = Components.classes;
+let Ci = Components.interfaces;
+let Cu = Components.utils;
 
 const Cc = Components.classes;
 const Ci = Components.interfaces;
