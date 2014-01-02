@@ -44,18 +44,3 @@ table#hourly-activity { width:100%; }
 table#hourly-activity tr.details td img.favicon { margin-right:5px; }
 table#hourly-activity tr.details td span { margin-left:5px; }
 table#hourly-activity tr.details td div { padding-top:5px; }
-
-table#downloads-pie td.details div { padding-bottom:3px; }
-table#downloads-pie td.details img { margin-right:5px; } 
-table#downloads-pie td.details span { margin-left:5px; } 
-
-table#daily-downloads { width:100%; }
-table#daily-downloads td[type='0'] { text-align:right; padding-left:5px; margin-right:0; }
-table#daily-downloads td[type='0'] div.bar { margin-right:0; }
-table#daily-downloads td[type='1'] { text-align:left; padding-right:5px; margin-left:0; }
-table#daily-downloads td[type='1'] div.bar { margin-left:0; }
-table#daily-downloads tr.details td div { padding-top:5px; }
-table#daily-downloads tr.details img { margin-right:5px; }
-table#daily-downloads tr.details span { margin-left:5px;  }
-
-div#downloads-stats { font-size:1.2em; padding-bottom:5px; }
