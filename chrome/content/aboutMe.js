@@ -40,6 +40,7 @@ let Ci = Components.interfaces;
 let Cu = Components.utils;
 
 Cu.import("resource://gre/modules/PluralForm.jsm");
+Cu.import("resource://gre/modules/Services.jsm");
 
 var hs = Cc["@mozilla.org/browser/nav-history-service;1"].
          getService(Ci.nsINavHistoryService);
@@ -48,35 +49,23 @@ var ios = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 var ms = Cc["@mozilla.org/mime;1"].getService(Ci.nsIMIMEService);
 
 var placesDB = hs.QueryInterface(Ci.nsPIPlacesDatabase).DBConnection;
-var downloadsDB = Cc["@mozilla.org/download-manager;1"].
-                  getService(Ci.nsIDownloadManager).DBConnection;
 
 // for localization
 var gStringBundle = document.getElementById("strings");
 
 function LOG(aMsg) {
-  Cc["@mozilla.org/consoleservice;1"].
-    getService(Ci.nsIConsoleService).
-    logStringMessage("ABOUT:ME: " + aMsg);
-  dump("ABOUT:ME: " + aMsg + "\n");
+  Services.console.logStringMessage("ABOUT:ME: " + aMsg);
 }
 
 var AboutMe = {
-  maxDownloads: [0, 0],
   dDAvg: [],
 
   init: function AM_init () {
     this.checkUserData();
 
     this.fillActivityStartDate();
-    this.fillDownloadsStartDate();
-
     this.fillMostVisitedSites();
     this.fillHourlyActivity();
-
-    this.fillDownloadsStats();
-    this.fillDownloadsPieChart();
-    this.fillDailyDownloads();
   },
 
   checkUserData: function AM_checkUserData () {
@@ -94,20 +83,6 @@ var AboutMe = {
         }
       }
     });
-    // check that downloads history exists
-    me.processQuery({
-      db: downloadsDB,
-      query: "SELECT COUNT(id) as count FROM moz_downloads",
-      handleRow: function checkUserDownloads_handleRow (aRow) {
-        let count = aRow.getResultByName("count");
-        if (count == 0) {
-          let msg = $("<div>").addClass("no-content-message").
-                    text(gStringBundle.getString("noDownloadsMessage"));
-          $("div#downloads-contents").hide().after(msg);
-          $("#downloads-start").hide();
-        }
-      }
-    });
   },
 
   // start dates --------------------------------------------------------------
@@ -121,20 +96,6 @@ var AboutMe = {
         let time = aRow.getResultByName("time");
         let text = gStringBundle.getFormattedString("since", [me.prettyTime(time)]);
         $("#activity-start").text(text);
-      }
-    });
-  },
-
-  fillDownloadsStartDate: function AM_fillDownloadsStartDate () {
-    let me = this;
-    me.processQuery({
-      db: downloadsDB,
-      query: "SELECT strftime('%s', MIN(startTime)/1000000, 'unixepoch', 'localtime') as time  \
-              FROM moz_downloads",
-      handleRow: function fillDonwloadsStartDate_handleRow (aRow) {
-        let time = aRow.getResultByName("time");
-        let text = gStringBundle.getFormattedString("since", [me.prettyTime(time)]);
-        $("#downloads-start").text(text);
       }
     });
   },
@@ -266,231 +227,6 @@ var AboutMe = {
     });
   },
 
-  // daily downloads trends ---------------------------------------------------
-
-  fillDailyDownloads: function AM_fillDailyDownloads () {
-    let me = this;
-    $("table#daily-downloads").barGraph({ type: "daily", barCount: 2 });
-
-    me.processQuery({
-      db: downloadsDB,
-      query: "SELECT COUNT(*) as number, \
-              ROUND(SUM(CAST(maxBytes AS FLOAT))/1048576, 2) as size, \
-              strftime('%w', endTime/1000000, 'unixepoch', 'localtime') as day \
-              FROM moz_downloads GROUP BY day ORDER BY day ASC",
-      handleRow: function fillDownloads_handleRow (aRow) {
-        let day = aRow.getResultByName("day");
-
-        let items = aRow.getResultByName("number");
-        let itemForm = gStringBundle.getString("itemCount");
-        let itemText = PluralForm.get(items, itemForm).replace("#1", items);
-        $("table#daily-downloads").barGraph({
-          index: day,
-          value: items,
-          label: itemText,
-          renderDetails: me.renderDownloadsDetails,
-          type: 0
-        });
-
-        let size = aRow.getResultByName("size");
-        let sizeForm = gStringBundle.getString("mbCount");
-        let sizeText = PluralForm.get(size, sizeForm).replace("#1", size);
-        $("table#daily-downloads").barGraph({
-          index: day,
-          value: size,
-          label: sizeText,
-          renderDetails: me.renderDownloadsDetails,
-          type: 1
-        });
-      }
-    });
-  },
-
-  // for a given day of the week:
-  // average bytes downloaded, average number of downloads
-  // 5 largest downloads (startTime, endTime, maxBytes, name, source, referrer)
-  renderDownloadsDetails: function AM_renderDownloadsDetails (detailsRow) {
-    let me = AboutMe;
-    let index = detailsRow.attr("index");
-    me.processQuery({
-      db: downloadsDB,
-      query: "SELECT COUNT(*) as number, \
-              ROUND(SUM(CAST(maxBytes AS FLOAT))/1048576, 2) as mb, \
-              strftime('%w', endTime/1000000, 'unixepoch', 'localtime') as day, \
-              strftime('%m-%d-%Y', endTime/1000000, 'unixepoch', 'localtime') as date \
-              FROM moz_downloads WHERE day = :day GROUP BY date \
-              ORDER BY endTime DESC",
-      params: { day: index },
-      handleRow: function fillDownloadsDetailsStats_handleRow (aRow) {
-        let day = aRow.getResultByName("day");
-        let mb = aRow.getResultByName("mb");
-        let number = aRow.getResultByName("number");
-
-        // maintain average number of downloads and avaerage download size
-        // todo: make this more readable
-        if (me.dDAvg[day]) {
-          me.dDAvg[day][0][0] = Math.round((me.dDAvg[day][0][0] + number) /
-                                (me.dDAvg[day][0][1]++)*100)/100;
-          me.dDAvg[day][1][0] = Math.round((me.dDAvg[day][1][0] + mb) /
-                                (me.dDAvg[day][1][1]++)*100)/100;
-        } else
-          me.dDAvg[day] = [[number, 1], [mb, 1]];
-
-        // update stats span or create a new one if it doesn't exist
-        let numForm = gStringBundle.getString("averageNumberOfDownloads");
-        let numText = PluralForm.get(me.dDAvg[day][0][0], numForm)
-                                .replace("#1", me.dDAvg[day][0][0]);
-        let sizeForm = gStringBundle.getString("averageDownloadSize");
-        let sizeText = PluralForm.get(me.dDAvg[day][1][0], sizeForm)
-                                 .replace("#1", me.dDAvg[day][1][0]);
-
-        // todo: make sure this is inserted before other details
-        if ($("td", detailsRow).length == 0)
-          detailsRow.append($("<td>").attr("colspan", 0));
-
-        if ($("div.stats", detailsRow).length > 0)
-          $("td div.stats", detailsRow).html(numText + "<br/>" + sizeText);
-        else
-          $("td", detailsRow).append($("<div>").addClass("stats").
-                                                html(numText + "<br/>" + sizeText));
-      }
-    });
-
-    me.processQuery({
-      db: downloadsDB,
-      query: "SELECT name, source, ROUND(CAST(maxBytes AS FLOAT)/1048576, 2) as size, \
-              startTime/1000 as start, endTime/1000 as end, target, \
-              strftime('%s', endTime/1000000, 'unixepoch', 'localtime') as time, \
-              strftime('%w', endTime/1000000, 'unixepoch', 'localtime') as day \
-              FROM moz_downloads WHERE day = :day ORDER BY maxBytes DESC LIMIT 5",
-      params: { day: index },
-      handleRow: function fillDownloadsDetailsList_handleRow (aRow) {
-        let img = $("<img>").attr("src", "moz-icon://" +
-                                         aRow.getResultByName("target") +
-                                         "?size=16");
-        let name = $("<a>").text(aRow.getResultByName("name")).
-                            attr("href", aRow.getResultByName("source"));
-
-        let size = aRow.getResultByName("size");
-        let sizeForm = gStringBundle.getString("mbCount");
-        let sizeText = $("<span>").text("(" + PluralForm.get(size, sizeForm).
-                                              replace("#1", size) + ")");
-        let timeText = $("<span>").addClass("time").
-                                   text(me.prettyTime(aRow.getResultByName("time")));
-
-        let content = $("<div>").append(img).append(name).
-                                 append(sizeText).append(timeText);
-
-        if ($("td", detailsRow).length == 0)
-          detailsRow.append($("<td>").attr("colspan", 0));
-
-        // todo: make sure this is inserted after stats
-        $("td", detailsRow).append(content);
-      }
-    });
-  },
-
-
-  // downloads stats ----------------------------------------------------------
-
-  fillDownloadsStats: function AM_fillDownloadsStats () {
-    let me = this;
-    me.processQuery({
-      db: downloadsDB,
-      query: "SELECT COUNT(*) as total, ROUND(SUM(maxBytes)/1048576, 2) as mb, \
-              ROUND(AVG(maxBytes)/1048576, 2) as avg FROM moz_downloads \
-              WHERE state = 1",
-      handleRow: function fillDownloadsStats_handleRow (aRow) {
-        let total = aRow.getResultByName("total");
-        let statsForm = gStringBundle.getString("downloadStats");
-        let statsText = PluralForm.get(total, statsForm)
-                                  .replace("#1", total)
-                                  .replace("#2", aRow.getResultByName("mb"))
-                                  .replace("#3", aRow.getResultByName("avg"));
-        $("div#downloads-stats").text(statsText);
-      }
-    });
-  },
-
-  // download media types -----------------------------------------------------
-
-  fillDownloadsPieChart: function AM_fillDownloadsPieChart () {
-    let me = this;
-    me.processQuery({
-      db: downloadsDB,
-      query: "SELECT COUNT(*) as count, mimeType FROM moz_downloads \
-              GROUP BY mimeType ORDER BY count DESC",
-      handleRow: function fillDownloadsPieChart_handleRow (aRow) {
-        let mimeType = aRow.getResultByName("mimeType");
-
-        let label = ms.getFromTypeAndExtension(mimeType, null).description ||
-                    mimeType;
-        if (label.length > 30)
-          label = label.substr(0, 30) + "...";
-
-        if (mimeType == "application/octet-stream" || mimeType == "" ||
-            $("table#downloads-pie").data("colorCounter") > 5) {
-          mimeType = "other";
-          label = gStringBundle.getString("otherTypes");
-        }
-
-        $("table#downloads-pie").pieChart({
-          key: mimeType,
-          value: aRow.getResultByName("count"),
-          label: label,
-          renderDetails: me.renderPieChartDetails
-        });
-      }
-    });
-  },
-
-  renderPieChartDetails: function AM_renderPieChartDetails (detailsDiv) {
-    let me = AboutMe;
-    let key = detailsDiv.attr("key");
-    let container = detailsDiv.parents("tr");
-    let item = $("td.legend div[key='" + key + "']", container);
-
-    let handleRow = function renderPieChartDetails_handleRow (aRow) {
-      let img = $("<img>").attr("src", "moz-icon://" +
-                                       aRow.getResultByName("target") +
-                                       "?size=16");
-      let name = $("<a>").text(aRow.getResultByName("name")).
-                          attr("href", aRow.getResultByName("source"));
-      let time = $("<span>").addClass("time").
-                             text(me.prettyTime(aRow.getResultByName("time")));
-      let content = $("<div>").append(img).append(name).append(time)
-
-      detailsDiv.attr("key", key).append(content);
-    }
-
-    if (key == "other") {
-      let whereClauses = [];
-      $("td.legend div", container).each(function () {
-        whereClauses.push("mimeType <> '" + $(this).attr("key") + "'");
-      });
-      me.processQuery({
-        db: downloadsDB,
-        query: "SELECT name, source, target, mimeType, \
-                ROUND(CAST(maxBytes AS FLOAT)/1048576, 2) as size, \
-                strftime('%s', endTime/1000000, 'unixepoch', 'localtime') as time \
-                FROM moz_downloads WHERE " + whereClauses.join(" AND ") + " \
-                ORDER BY endTime DESC LIMIT 5",
-        handleRow: handleRow
-      });
-    } else {
-      me.processQuery({
-        db: downloadsDB,
-        query: "SELECT name, source, target, mimeType, \
-                ROUND(CAST(maxBytes AS FLOAT)/1048576, 2) as size, \
-                strftime('%s', endTime/1000000, 'unixepoch', 'localtime') as time \
-                FROM moz_downloads WHERE mimeType = :type \
-                ORDER BY endTime DESC LIMIT 5",
-        params: { type: key },
-        handleRow: handleRow
-      });
-    }
-  },
-
   // helper functions ---------------------------------------------------------
 
   prettyDomain: function AM_prettyDomain (rev_host) {
@@ -507,12 +243,12 @@ var AboutMe = {
     return (new Date(time*1000)).format(dateTimeFormat);
   },
 
+  // runs a query against the places db
   processQuery: function AM_processQuery (aItem) {
     if (!aItem.query.length)
       return;
 
-    var db = aItem.db || placesDB;
-    var stmt = db.createStatement(aItem.query);
+    var stmt = placesDB.createStatement(aItem.query);
 
     if (aItem.params) {
       for (let [name, value] in Iterator(aItem.params)) {

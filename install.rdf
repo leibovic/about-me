@@ -6,7 +6,7 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>aboutme@test.mozilla.com</em:id>
     <em:bootstrap>true</em:bootstrap>
-    <em:version>0.6</em:version>
+    <em:version>0.7</em:version>
     <em:type>2</em:type>
 
     <!-- Target Application this extension can install into,
@@ -14,8 +14,8 @@
     <em:targetApplication>
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-        <em:minVersion>3.5</em:minVersion>
-        <em:maxVersion>22.*</em:maxVersion>
+        <em:minVersion>26.0</em:minVersion>
+        <em:maxVersion>29.*</em:maxVersion>
       </Description>
     </em:targetApplication>
 
